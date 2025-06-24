@@ -1,0 +1,129 @@
+<% layout("boilerplate.ejs") %>
+
+  
+  <div class="row mt-3">
+
+  <div class="col-8 offset-2">
+    
+    <h3>list new listing</h3>
+    <form method="POST" action ="/listings" 
+     class="needs-validation" enctype="multipart/form-data" novalidate>
+      <div class="mb-3">
+      <label for="title" class="form-label" >Title</label>
+      <input name="listing[title]" placeholder="enter a cachytitle" type="text" class="form-control" required >
+      <div class="valid-feedback"> Title looks good!</div>
+      </div>
+      
+      <div class="mb-3">
+        <label for="description" class="form-label" >Description</label>
+        
+        <textarea name="listing[description]" type="text" class="form-control" required ></textarea>
+        <div class="invalid-feedback"> please enter a short description</div>
+      </div>
+      
+      
+      <div class="mb-3">
+        <label for="image" class="form-label" >Upload Listing Image</label>
+      <input name="listing[image]"  type="file" class="form-control"/>
+      </div>
+      <div class="row">
+      <div class="mb-3 col-md-4 " >
+        <label for="price" class="form-label" >Price</label>
+      <input name="listing[price]" placeholder="enter price"  class="form-control" required >
+      <div class="invalid-feedback"> Price should be valid </div>
+      </div>
+      
+      <div class="mb-3 col-md-8 " >
+        <label for="propertyType" class="form-label">Select Property Type:</label>
+        <select  name="listing[propertyType][]" class="form-control form-select " multiple  required>
+            <option value="" disabled selected>-- Select Property Type --</option>
+            
+            <optgroup label="Residential">
+                <option value="apartment">Apartment/Flat</option>
+                <option value="independent_house">Independent House/Villa</option>
+                <option value="townhouse">Townhouse/Row House</option>
+                <option value="condo">Condominium (Condo)</option>
+                <option value="studio">Studio Apartment</option>
+            </optgroup>
+    
+            <optgroup label="Commercial">
+                <option value="office">Office Space</option>
+                <option value="retail">Retail Space</option>
+                <option value="hotel">Hotel/Resort</option>
+                <option value="warehouse">Warehouse/Storage</option>
+            </optgroup>
+    
+            <optgroup label="Flats">
+                <option value="1BHK">1BHK</option>
+                <option value="2BHK">2BHK</option>
+                <option value="PentHouse">PentHouse</option>
+            </optgroup>
+    
+            <optgroup label="Iconic cities">
+                <option value="residential_commercial">Residential + Commercial</option>
+                <option value="office_retail">Office + Retail</option>
+                <option value="hospitality_residential">Hospitality + Residential</option>
+            </optgroup>
+    
+            <optgroup label="Special Purpose">
+                <option value="educational">Educational Institution</option>
+                <option value="healthcare">Healthcare Facility</option>
+                <option value="religious">Religious Building</option>
+                <option value="sports">Sports & Entertainment Venue</option>
+            </optgroup>
+    
+            <optgroup label="Agricultural & Land">
+                <option value="farmland">Farmland</option>
+                <option value="Mountains">Valley side</option>
+                <option value="vacant_land">Vacant Land/Plot</option>
+            </optgroup>
+            <optgroup label="Features">
+              <option value="Rooms">RoomForRent</option>
+              <option value="Swimmingpool">Swimmingpool</option>
+              <option value="eastFacing">EastFacing</option>
+          </optgroup>
+    
+        </select>
+      <div class="invalid-feedback"> Select atleast one category </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+     </div>
+     <div class="row">
+      <div class="mb-3 col-md-4">
+        <label for="country" class="form-label"  >Country</label>
+      <input name="listing[country]" placeholder="India" type="text" class="form-control" required >
+      <div class="invalid-feedback"> Country name should be valid </div>
+     </div>
+     <div class="mb-3 col-md-8">
+      <label for="location" class="form-label" >Location</label>
+      <input name="listing[location]" placeholder="enter location" type="text" class="form-control" required >
+      <div class="invalid-feedback"> Location should be valid </div>
+      </div>
+      </div>
+      <button class="btn btn-dark add-btn mt-3 mb-3">Add</button>
+     
+    </form>
+</body>
+</div>
+</div>

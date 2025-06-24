@@ -1,0 +1,269 @@
+ <% layout("boilerplate.ejs") %> 
+
+    <div class ="row mt-3">
+       <div class="col-8 with offset-3">
+        <h3><%= listing.title %></h3> 
+         
+      </div>
+        <div class="card col-6 offset-3 show-card listing-card">
+          
+          <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing-image">
+          <div class="card-body">
+            <p class="card-text">Ownedby <i> <%= listing.owner.username %></i> </p>
+            <p class="card-text"> <%= listing.description %>  </p>
+            <p class="card-text"></p>  &#8377 <%= listing.price.toLocaleString("en-IN") %> </p>
+            <p class="card-text"></p>  <%= listing.location %> </p>
+            <p class="card-text"> <%= listing.country %> </p>
+            
+          </div>
+        </div>
+        <br />
+        <% if(currUser && listing.owner._id.equals(currUser._id)) {%>
+        <div class="btns">
+        
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 ">Edit</a>
+        
+        <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+        <button class="btn btn-dark offset-5"> Delete</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    
+     <div class="col-8 offset-3 mb-3">
+     <div class="row mt-3 mb-3">
+      <% if(currUser) { %>
+        <hr/>
+       <% if( !listing.owner._id.equals(currUser._id)) { %>
+          <button class="btn btn-dark col-4  " id="fav-<%= listing._id %>"
+            onclick="toggleFavorite('<%= currUser._id %>', '<%= listing._id %>')">
+            <% if (favoriteListings.includes(  listing._id.toString())) { %>
+                Added to Favorite 
+            <% } 
+            else { %>
+                Add to Favorite
+            <% } %>
+        </button>
+         <% } %>
+         
+        
+
+        
+        
+          <% if (currUser&&!listing.owner._id.equals(currUser._id)) { %>
+            <% if (!listing.tokenPaid) { %>
+              <button class="btn btn-dark col-4 offset-4" id="pay-btn">Pay Token Money</button>
+            <% } else { %>
+              <button class="btn btn-dark col-4 offset-4" disabled>Already Paid</button>
+            <% } %>
+          <% } %>
+        
+        
+</div>
+
+
+
+
+
+
+
+      <h4>Leave a Review</h4>
+      <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
+        <div class="mb-3 mt-3">
+          <label for="rating" class="form-label"> Rating</label>
+          <input type="range" min="1" max="5" id="rating"   class="form-range" name="review[rating]" />
+        </div>
+        
+        <div class="mb-3 mt-3">
+          <label for="Comment" class="form-label">Comments</label>
+          <textarea name="review[comment]" id="comment" class="form-control" cols="30" rows="5" required></textarea>
+           <div class="invalid-feedback">Please add some comments for review</div>
+        </div>
+        <button class="btn btn-outline-dark">Submit</button>
+      </form>
+      
+<hr/>
+      <% } %>
+
+      
+      <% if(listing.reviews.length>0) { %>
+      <div class="row">
+        <p><b>All reviews</b></p>
+      <% for( review of listing.reviews) { %>
+        <div class="card col-5 ms-3 mb-3">
+          <div class="card-body">
+            <h5 class="card-title"> @<%= review.author.username %> </h5>
+            <p class="card-text"><%= review.comment %></p>
+       <p class="card-text"> <%= review.rating %> stars</p>
+       
+       <form class="mb-3" method="POST" action="/listings/<%=listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+          <button class="btn btn-sm btn-dark">Delete</button>
+       </form>
+     </div>
+       </div>
+      <% } %>
+      </div>
+      <% } %>
+     </div>   
+     <div class="col-6 offset-3 mb-3">
+      <h3>Where you'll be</h3>
+      <div id="map"></div>
+     </div>
+    
+     <% if(true) { %>
+     <script>
+      var map = L.map('map').setView([28.6139, 77.2090], 10); 
+  
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+  
+      var marker; 
+   
+         
+          var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("<%= listing.location %>" )}`;
+  
+          fetch(url).then(response => response.json())
+          .then(data => {
+              if (data.length > 0) {
+                  var lat = data[0].lat;
+                  var lon = data[0].lon;
+                  var location = [lat, lon];
+  
+                  if (marker) map.removeLayer(marker);
+  
+                  
+                  marker = L.marker(location).addTo(map).bindPopup(`Location: ${data[0].display_name} <br/> <b>Exact Location will be provided after booking <b>`)
+                      .openPopup();
+
+                  map.setView(location, 15);
+              } else {
+                  alert("Location not found!");
+              }
+          })
+          .catch(error => console.error("Error fetching geocode data:", error));
+          function toggleFavorite(userId, listingId) {
+    if (!userId || !listingId) {
+        console.error("Missing userId or listingId!", userId, listingId);
+        return;
+    }
+
+    const button = document.getElementById(`fav-${listingId}`);
+    if (!button) {
+        console.error("Button not found for listing:", listingId);
+        return;
+    }
+
+    console.log("Sending to backend:", { userId, listingId });
+
+    fetch(`/listings/favourite/${listingId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, listingId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Server response:", data);
+
+        if (data.success) {
+            // Toggle button text and styling
+            if (data.isFavorite) {
+                button.innerHTML = "Added to Favorite ✅";
+                button.classList.add('btn-success');
+                button.classList.remove('btn-dark');
+            } else {
+                console.log()
+                button.innerHTML = "Add to Favorite";
+                button.classList.add('btn-dark');
+                button.classList.remove('btn-success');
+            }
+        } else {
+            alert("Failed to update favorite status!");
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}   
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+      const payBtn = document.getElementById("pay-btn");
+
+      if (payBtn) {
+          payBtn.addEventListener("click", async function () {
+              // Check if user is logged in
+              const currUser = "<%= JSON.stringify(currUser) %>"; 
+              if (!currUser) {
+                  alert("You must be logged in to make a payment!");
+                  return;
+              }
+
+              try {
+                  const listingId = "<%= listing._id %>";
+                  const userId = currUser._id;
+
+                  // Step 1: Create payment order on backend
+                  const response = await fetch(`/listings/payment/${listingId}`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ listingId })
+                  });
+
+                  const data = await response.json();
+
+                  if (!data.success) {
+                      alert("Failed to create order: " + data.error);
+                      return;
+                  }
+
+                  // Step 2: Open Razorpay popup
+                  const options = {
+                      key: "<%= process.env.RAZORPAY_KEY_ID %>",
+                      amount: data.amount,
+                      currency: "INR",
+                      name: "Real Estate Token",
+                      description: "Token Money Payment",
+                      order_id: data.orderId,
+                      handler: async function (response) {
+                          // Step 3: Verify payment on backend
+                          const verifyResponse = await fetch("/listings/pay/verify", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                  razorpay_payment_id: response.razorpay_payment_id,
+                                  razorpay_order_id: response.razorpay_order_id,
+                                  razorpay_signature: response.razorpay_signature,
+                                  listingId,
+                                  userId
+                              })
+                          });
+
+                          const verifyData = await verifyResponse.json();
+                          if (verifyData.success) {
+                              alert("Payment Successful!");
+                              window.location.reload(); // Refresh page to update UI
+                          } else {
+                              alert("Payment verification failed!");
+                          }
+                      }
+                  };
+
+                  const rzp = new Razorpay(options);
+                  rzp.open();
+              } catch (error) {
+                  console.error("Payment error:", error);
+                  alert("Something went wrong. Please try again.");
+              }
+          });
+      }
+  })
+
+        </script>
+          <% } %>
+  
+  </div>
+  
