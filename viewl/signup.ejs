@@ -21,7 +21,7 @@
       const idToken = await result.user.getIdToken();
 
       
-      const res = await fetch("/google-auth", {
+      const res = await fetch("/googlelogin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

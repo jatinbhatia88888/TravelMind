@@ -78,3 +78,31 @@ module.exports.login=async (req,res)=>{
 module.exports.renderLoginForm=(req,res)=>{
     res.render("./login.ejs");
 }
+
+
+module.exports.googleLogin = async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { email } = decodedToken;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "No account exists with this Google email. Please sign up first.",
+      });
+    }
+
+    req.login(user, (err) => {
+      if (err) return res.status(500).json({ success: false, error: "Login failed" });
+      return res.json({ success: true });
+    });
+
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    return res.status(401).json({ success: false, error: "Invalid ID token" });
+  }
+};

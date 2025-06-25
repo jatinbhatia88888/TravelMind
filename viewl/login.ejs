@@ -1,3 +1,48 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyCr7N_lMwTuyHqID9yIpobhbjTZZrpU4iU",
+    authDomain: "tourmind-22830.firebaseapp.com",
+    projectId: "tourmind-22830",
+    appId:  "1:681391404512:web:07e2ec246798d53448a785"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  document.querySelector(".btn-google").addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      const res = await fetch("/google-auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ idToken })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = "/listings";
+      } else {
+        alert("Google login failed");
+      }
+    } catch (err) {
+      console.error("Google sign-in error:", err);
+      alert("Something went wrong");
+    }
+  });
+</script>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,7 +85,7 @@
 
       
       <div class="col-md-6 right-pane d-flex flex-column justify-content-center align-items-center text-center p-4">
-        <h1 class="fw-bold mb-4">MobiConnect</h1>
+        <h1 class="fw-bold mb-4">Travel Mind</h1>
         <h4 class="mb-3">Your travel experience, reimagined.</h4>
         <blockquote class="blockquote">
           <p>“Plan smarter, travel better, or manage your hotel — all from one place.”</p>
