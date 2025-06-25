@@ -12,7 +12,7 @@ const {storage} = require("../cloudConfig.js");
 const upload=multer({storage});
 router.route("/")
 .get( wrapAsync(listingController.index))
-.post(isLoggedIn,upload.single('listing[image]'),validateListing,wrapAsync( listingController.createListing) );
+.post(isLoggedIn,upload.array('listing[images]'),validateListing,wrapAsync( listingController.createListing) );
 router.route("/favourite/:id")
 .post(isLoggedIn,wrapAsync( listingController.addToFavourite) )
 .get(isLoggedIn,wrapAsync(listingController.Favourite));

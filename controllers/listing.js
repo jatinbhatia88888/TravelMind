@@ -3,11 +3,11 @@ const Favorite=require("../models/favourite.js");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const User= require("../models/user.js");
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
+const admin = require("../utils/admin.js");
 
+
+
+  
 module.exports.index=async (req,res)=>{
   const allListings= await Listing.find({});
   res.render("index.ejs",{allListings});
@@ -35,19 +35,26 @@ module.exports.showListing=async (req,res)=>{
   
     res.render("show.ejs",{listing,userId,favoriteListings});
 } 
-module.exports.createListing=async (req,res,next)=>{
-     
-     let url =req.file.path;
-     let filename=req.file.filename;
-     
-    const newq= new Listing(req.body.listing);
-     console.log(req.body.listing.propertyType);
-    newq.owner=req.user._id;
-    newq.image={url,filename};
-    await newq.save();
-    req.flash("success","New Listing Created!");
-    res.redirect("/listings");
-    }
+module.exports.createListing = async (req, res, next) => {
+  console.dir(req.body.listing);
+  const newListing = new Listing(req.body.listing);
+  
+  newListing.owner = req.user._id;
+
+
+  
+  if (req.files && req.files.length > 0) {
+    newListing.images = req.files.map(file => ({
+      url: file.path,
+      filename: file.filename
+    }));
+  }
+
+  await newListing.save();
+  req.flash("success", "New Listing Created!");
+  res.redirect("/listings");
+};
+
 module.exports.destroyListing=async (req,res)=>{
     let {id} =req.params;
     let deleteListing= await Listing.findByIdAndDelete(id);
@@ -61,8 +68,10 @@ module.exports.renderEditForm=async (req,res)=>{
         req.flash("error","Listing you requested for does not exist!");
         res.redirect("/listings");
     }
-    let originalImageUrl= listing.image.url;
-    originalImageUrl= originalImageUrl.replace("/upload","/upload/w_250")
+    let originalImageUrl = listing.images.length > 0 ? listing.images[0].url : null;
+if (originalImageUrl) {
+  originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
+}
     res.render("edit.ejs",{listing,originalImageUrl});
 }
 module.exports.updateListing=async (req,res)=>{

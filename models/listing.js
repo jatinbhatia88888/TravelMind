@@ -1,55 +1,46 @@
-const mongoose=require("mongoose")
-const Schema =mongoose.Schema;
-const Review=require("./review.js")
-const listingSchema=new Schema({
-    title:{
-        type:String,
-        required:true,
-    },
-    description:String,
-    image: {
-        url:String,
-        filename:String,
-    },
-    
-    price:Number,
-    location:String,
-    country:String,
-    reviews: [
-        {
-           type: Schema.Types.ObjectId,
-           ref:"Review",
-        }
-    ],
-    owner:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-    },
-    propertyType:[
-        {
-            type:[String],
-            required:true,
-        }
-    ],
-    tokenPaid: {
-        type: Boolean,
-        default: false,  
-    },
-    tokenPaymentId: {     
-        type: String,  
-        default: null,
-    },
-    buyer: {
-        type: Schema.Types.ObjectId,
-        ref: "User",  
-        default: null,
+const mongoose =require("mongoose");
+const Schema=mongoose.Schema;
+const listingSchema = new Schema({
+  title: { type: String, required: true },
+  description: String,
+  images: [
+    {
+      url: String,
+      filename: String
     }
-    
+  ],
+  price: Number,
+  category: {
+    type: String,
+    enum: ['budget', 'luxury', 'resort', 'hostel', 'homestay', 'boutique'],
+    required: true
+  },
+  roomCount: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  amenities: [String],
+  checkIn: { type: String, required: true },
+  checkOut: { type: String, required: true },
+  location: {
+    street: String,
+    city: String,
+    state: String,
+    country: String,
+    pincode: String
+  },
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+  owner: { type: Schema.Types.ObjectId, ref: 'User' },
+  propertyType: [{ type: String }],
+  cancellationPolicy: {
+    type: String,
+    enum: ['free_24h', 'partial', 'none'],
+    default: 'free_24h'
+  },
+  tokenPaid: { type: Boolean, default: false },
+  tokenPaymentId: { type: String, default: null },
+  client: { type: Schema.Types.ObjectId, ref: 'User', default: null }
 });
-listingSchema.post("findOneAndDelete",async (listing)=>{
-    if(listing){
-    await Review.deleteMany({_id:{$in:listing.reviews}});
-    }
-})
-const Listing = mongoose.model("Listing",listingSchema);
-module.exports=Listing
+
+module.exports =mongoose.model("Listing",listingSchema);

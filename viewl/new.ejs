@@ -1,129 +1,162 @@
-<% layout("boilerplate.ejs") %>
 
-  
-  <div class="row mt-3">
+  <% layout("boilerplate.ejs") %>
 
+<div class="row mt-4">
   <div class="col-8 offset-2">
-    
-    <h3>list new listing</h3>
-    <form method="POST" action ="/listings" 
-     class="needs-validation" enctype="multipart/form-data" novalidate>
-      <div class="mb-3">
-      <label for="title" class="form-label" >Title</label>
-      <input name="listing[title]" placeholder="enter a cachytitle" type="text" class="form-control" required >
-      <div class="valid-feedback"> Title looks good!</div>
-      </div>
-      
-      <div class="mb-3">
-        <label for="description" class="form-label" >Description</label>
-        
-        <textarea name="listing[description]" type="text" class="form-control" required ></textarea>
-        <div class="invalid-feedback"> please enter a short description</div>
-      </div>
-      
-      
-      <div class="mb-3">
-        <label for="image" class="form-label" >Upload Listing Image</label>
-      <input name="listing[image]"  type="file" class="form-control"/>
-      </div>
-      <div class="row">
-      <div class="mb-3 col-md-4 " >
-        <label for="price" class="form-label" >Price</label>
-      <input name="listing[price]" placeholder="enter price"  class="form-control" required >
-      <div class="invalid-feedback"> Price should be valid </div>
-      </div>
-      
-      <div class="mb-3 col-md-8 " >
-        <label for="propertyType" class="form-label">Select Property Type:</label>
-        <select  name="listing[propertyType][]" class="form-control form-select " multiple  required>
-            <option value="" disabled selected>-- Select Property Type --</option>
-            
-            <optgroup label="Residential">
-                <option value="apartment">Apartment/Flat</option>
-                <option value="independent_house">Independent House/Villa</option>
-                <option value="townhouse">Townhouse/Row House</option>
-                <option value="condo">Condominium (Condo)</option>
-                <option value="studio">Studio Apartment</option>
-            </optgroup>
-    
-            <optgroup label="Commercial">
-                <option value="office">Office Space</option>
-                <option value="retail">Retail Space</option>
-                <option value="hotel">Hotel/Resort</option>
-                <option value="warehouse">Warehouse/Storage</option>
-            </optgroup>
-    
-            <optgroup label="Flats">
-                <option value="1BHK">1BHK</option>
-                <option value="2BHK">2BHK</option>
-                <option value="PentHouse">PentHouse</option>
-            </optgroup>
-    
-            <optgroup label="Iconic cities">
-                <option value="residential_commercial">Residential + Commercial</option>
-                <option value="office_retail">Office + Retail</option>
-                <option value="hospitality_residential">Hospitality + Residential</option>
-            </optgroup>
-    
-            <optgroup label="Special Purpose">
-                <option value="educational">Educational Institution</option>
-                <option value="healthcare">Healthcare Facility</option>
-                <option value="religious">Religious Building</option>
-                <option value="sports">Sports & Entertainment Venue</option>
-            </optgroup>
-    
-            <optgroup label="Agricultural & Land">
-                <option value="farmland">Farmland</option>
-                <option value="Mountains">Valley side</option>
-                <option value="vacant_land">Vacant Land/Plot</option>
-            </optgroup>
-            <optgroup label="Features">
-              <option value="Rooms">RoomForRent</option>
-              <option value="Swimmingpool">Swimmingpool</option>
-              <option value="eastFacing">EastFacing</option>
-          </optgroup>
-    
-        </select>
-      <div class="invalid-feedback"> Select atleast one category </div>
-      </div>
+    <h3 class="mb-4">List Your Hotel</h3>
 
+    <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation" novalidate>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-     </div>
-     <div class="row">
-      <div class="mb-3 col-md-4">
-        <label for="country" class="form-label"  >Country</label>
-      <input name="listing[country]" placeholder="India" type="text" class="form-control" required >
-      <div class="invalid-feedback"> Country name should be valid </div>
-     </div>
-     <div class="mb-3 col-md-8">
-      <label for="location" class="form-label" >Location</label>
-      <input name="listing[location]" placeholder="enter location" type="text" class="form-control" required >
-      <div class="invalid-feedback"> Location should be valid </div>
-      </div>
-      </div>
-      <button class="btn btn-dark add-btn mt-3 mb-3">Add</button>
      
+      <div class="mb-3">
+        <label for="title" class="form-label">Hotel Name</label>
+        <input name="listing[title]" type="text" class="form-control" placeholder="Enter catchy hotel name" required>
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" class="form-control" rows="3" placeholder="Brief about your hotel..." required></textarea>
+        <div class="invalid-feedback">Please provide a short description</div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="images" class="form-label">Upload Hotel Images</label>
+        <input type="file" name="listing[images]" class="form-control" accept="image/*" multiple required>
+      </div>
+
+     
+      <div class="mb-3">
+        <label for="price" class="form-label">Price per Night (₹)</label>
+        <input type="number" name="listing[price]" class="form-control" required>
+        <div class="invalid-feedback">Please enter a valid price</div>
+      </div>
+      
+   <div class="mb-3">
+   <label for="roomCount" class="form-label">Total Number of Rooms</label>
+  <input type="number" name="listing[roomCount]" class="form-control" placeholder="e.g., 10" min="1" required>
+    <div class="invalid-feedback">Please enter a valid number of rooms</div>
+   </div>
+      
+      <div class="mb-3">
+        <label for="category" class="form-label">Hotel Category</label>
+        <select name="listing[category]" class="form-select" required>
+          <option value="" disabled selected>Select a category</option>
+          <option value="budget">Budget Hotel</option>
+          <option value="luxury">Luxury Stay</option>
+          <option value="resort">Resort</option>
+          <option value="hostel">Hostel</option>
+          <option value="homestay">Homestay</option>
+          <option value="boutique">Boutique Hotel</option>
+        </select>
+        <div class="invalid-feedback">Select a hotel category</div>
+      </div>
+
+      
+      <div class="mb-3">
+  <label class="form-label">Amenities</label><br>
+
+  <div class="form-check form-check-inline">
+    <input type="checkbox" class="form-check-input" name="listing[amenities][]" value="wifi" id="amenity-wifi">
+    <label class="form-check-label" for="amenity-wifi">Wi-Fi</label>
+  </div>
+
+  <div class="form-check form-check-inline">
+    <input type="checkbox" class="form-check-input" name="listing[amenities][]" value="pool" id="amenity-pool">
+    <label class="form-check-label" for="amenity-pool">Pool</label>
+  </div>
+
+  <div class="form-check form-check-inline">
+    <input type="checkbox" class="form-check-input" name="listing[amenities][]" value="parking" id="amenity-parking">
+    <label class="form-check-label" for="amenity-parking">Parking</label>
+  </div>
+
+  <div class="form-check form-check-inline">
+    <input type="checkbox" class="form-check-input" name="listing[amenities][]" value="restaurant" id="amenity-restaurant">
+    <label class="form-check-label" for="amenity-restaurant">Restaurant</label>
+  </div>
+</div>
+
+
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="checkIn" class="form-label">Check-in Time</label>
+          <input type="time" name="listing[checkIn]" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label for="checkOut" class="form-label">Check-out Time</label>
+          <input type="time" name="listing[checkOut]" class="form-control" required>
+        </div>
+      </div>
+
+      
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="country" class="form-label">Country</label>
+          <input name="listing[location][country]" type="text" class="form-control" value="India" required>
+        </div>
+        <div class="col-md-4">
+          <label for="state" class="form-label">State</label>
+          <input name="listing[location][state]" type="text" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="city" class="form-label">City</label>
+          <input name="listing[location][city]" type="text" class="form-control" required>
+        </div>
+      </div>
+
+     
+      <div class="row mb-3">
+        <div class="col-md-8">
+          <label for="street" class="form-label">Street / Area</label>
+          <input name="listing[location][street]" type="text" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="pincode" class="form-label">Pincode</label>
+          <input name="listing[location][pincode]" type="text" class="form-control" required>
+        </div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="cancellationPolicy" class="form-label">Cancellation Policy</label>
+        <select name="listing[cancellationPolicy]" class="form-select" required>
+          <option value="" disabled selected>Select policy</option>
+          <option value="free_24h">Free until 24 hours before check-in</option>
+          <option value="partial">Partial refund (50%)</option>
+          <option value="none">No refund</option>
+        </select>
+      </div>
+
+    
+      <button type="submit" class="btn btn-primary mt-3">Submit Listing</button>
     </form>
-</body>
+  </div>
 </div>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+     

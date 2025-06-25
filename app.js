@@ -115,14 +115,14 @@ async function main(){
     await mongoose.connect(dbUrl);
 }
 
-app.get("/demouser",async (req,res)=>{
-    let fakeUser= new User({
-     email:"student@gmail.com",
-     username:"delta-student",
-    });
- let registerUser =await User.register(fakeUser,"helloworld");
- res.send(registerUser);
-});
+// app.get("/demouser",async (req,res)=>{
+//     let fakeUser= new User({
+//      email:"student@gmail.com",
+//      username:"delta-student",
+//     });
+//  let registerUser =await User.register(fakeUser,"helloworld");
+//  res.send(registerUser);
+// });
 
 // app.get("/listings/paid/:id",async(req,res)=>{
 //     const userId=req.user._id.toString();

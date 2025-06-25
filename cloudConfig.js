@@ -8,7 +8,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: 'travelworld_DEV',
+      folder: 'TravelMIND',
       allowedFormats: ["png","jpg","jpeg"],
       
     },

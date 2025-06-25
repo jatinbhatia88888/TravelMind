@@ -5,9 +5,12 @@ const wrapAsnyc=require("../utils/wrapAsyc.js")
 const passport= require("passport");
 const {saveRedirectUrl}=require("../middleware.js")
 const userController =require("../controllers/user.js");
+
 router.route("/signup")
 .get(userController.renderSignupForm)
-.post(wrapAsnyc(userController.signup));
+.post(wrapAsnyc(userController.signup))
+router.route("/google-auth")
+.post(userController.googleAuth);
 router.route("/login")
 .get(userController.renderLoginForm)
 .post(saveRedirectUrl,passport.authenticate('local',{failureRedirect:'/login',failureFlash:true,}),userController.login);

@@ -1,0 +1,53 @@
+footer {
+  background: linear-gradient(to right, #3e52b5, #546de5);
+  color: #0b2b2c;
+  padding: 1.2rem 0.5rem; 
+  text-align: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.f-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem; 
+}
+
+.f-info-brand {
+  font-weight: 600;
+  font-size: 0.95rem; 
+  color: #ffffff;
+}
+
+.f-info-links a {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.f-info-links a:hover {
+  color: #ffdd57;
+  text-decoration: underline;
+}
+
+.f-info-socails {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+.f-info-socails i {
+  color: #ffffff;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.f-info-socails i:hover {
+  color: #ffdd57;
+  transform: scale(1.1);
+}
