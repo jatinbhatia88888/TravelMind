@@ -1,6 +1,6 @@
 const express=require("express");
 const wrapAsync= require("../utils/wrapAsyc.js");
-const {isLoggedIn,isOwner,validateListing} =require("../middleware.js");
+const {isLoggedIn,isOwner,validateListing,owner} =require("../middleware.js");
 const router=express.Router();
 const Listing=require("../models/listing.js");
 const ExpressError=require("../utils/ExpressError.js")
@@ -23,12 +23,12 @@ router.route("/payment/:id")
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 router.route("/:id")
 .get(wrapAsync(listingController.showListing))
-.put(isLoggedIn,isOwner,upload.single('listing[image]'),validateListing,wrapAsync(listingController.updateListing))
+.put(isLoggedIn,isOwner,upload.array('listing[images]'),validateListing,wrapAsync(listingController.updateListing))
 .delete(isLoggedIn,isOwner,wrapAsync(listingController.destroyListing));
 
 router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm));
 router.post("/pay/verify",isLoggedIn,wrapAsync(listingController.confirm));
-
+router.get("/owner/bookings", isLoggedIn, owner, wrapAsync(listingController.showOwnerBookings));
 module.exports=router;
     
     

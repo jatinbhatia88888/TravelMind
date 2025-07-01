@@ -6,6 +6,10 @@ const User= require("../models/user.js");
 const admin = require("../utils/admin.js");
 
 
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
   
 module.exports.index=async (req,res)=>{
@@ -78,12 +82,12 @@ module.exports.updateListing=async (req,res)=>{
 
   let {id}=req.params;
  
- let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
- if(typeof req.file !== "undefined") {
- let url =req.file.path;
-     let filename=req.file.filename;
-     listing.image={url,filename};
- }
+ let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+ if (req.files && req.files.length > 0) {
+    const newImages = req.files.map(file => ({ url: file.path, filename: file.filename }));
+   listing.images = newImages; 
+  }
      await listing.save();
  req.flash("success","Listing Updated!");
   res.redirect(`/listings/${id}`)
@@ -128,6 +132,13 @@ module.exports.Favourite=async (req,res)=>{
     const userId=req.user._id.toString();
     
         let favoriteListings = await Favorite.findOne({ userId });
+        if(!favoriteListings){
+          req.flash("error", "No favourite listing till now");
+
+           res.render("index.ejs",{allListings:[]});
+           return ;
+        }
+
         const listingExists = favoriteListings.listingId;
         const allListings = await Listing.find({ _id: { $in: listingExists } });
        
@@ -190,3 +201,7 @@ module.exports.payment=async (req, res) => {
           res.render("index.ejs",{allListings});
       
   }
+  module.exports.showOwnerBookings = async (req, res) => {
+  const listings = await Listing.find({ owner: req.user._id, tokenPaid: true }).populate("client");
+  res.render("booking.ejs", { listings });
+};

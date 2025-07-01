@@ -121,7 +121,7 @@
       var marker; 
    
          
-          var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("<%= listing.location %>" )}`;
+          var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("<%= listing.location.city %>" )}`;
   
           fetch(url).then(response => response.json())
           .then(data => {
@@ -166,7 +166,7 @@
         console.log("Server response:", data);
 
         if (data.success) {
-            // Toggle button text and styling
+            
             if (data.isFavorite) {
                 button.innerHTML = "Added to Favorite ✅";
                 button.classList.add('btn-success');
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (payBtn) {
           payBtn.addEventListener("click", async function () {
-              // Check if user is logged in
+             
               const currUser = "<%= JSON.stringify(currUser) %>"; 
               if (!currUser) {
                   alert("You must be logged in to make a payment!");
@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   const listingId = "<%= listing._id %>";
                   const userId = currUser._id;
 
-                  // Step 1: Create payment order on backend
+                 
                   const response = await fetch(`/listings/payment/${listingId}`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       return;
                   }
 
-                  // Step 2: Open Razorpay popup
+                  
                   const options = {
                       key: "<%= process.env.RAZORPAY_KEY_ID %>",
                       amount: data.amount,
@@ -229,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       description: "Token Money Payment",
                       order_id: data.orderId,
                       handler: async function (response) {
-                          // Step 3: Verify payment on backend
+                          
                           const verifyResponse = await fetch("/listings/pay/verify", {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
                           const verifyData = await verifyResponse.json();
                           if (verifyData.success) {
                               alert("Payment Successful!");
-                              window.location.reload(); // Refresh page to update UI
+                              window.location.reload(); 
                           } else {
                               alert("Payment verification failed!");
                           }

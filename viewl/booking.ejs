@@ -1,0 +1,42 @@
+<% layout('boilerplate') %>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Bookings Received</h2>
+
+  <% if (listings.length === 0) { %>
+    <div class="alert alert-info">You haven't received any bookings yet.</div>
+  <% } %>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    <% listings.forEach(listing => { %>
+      <% if (listing.tokenPaid && listing.client) { %>
+        <div class="col">
+          <div class="card shadow-sm h-100">
+            <img src="<%= listing.images[0]?.url || '/default.jpg' %>" class="card-img-top" alt="Hotel Image">
+            <div class="card-body">
+              <h5 class="card-title"><%= listing.title %></h5>
+              <p class="card-text"><%= listing.description.substring(0, 100) %>...</p>
+
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><strong>Client:</strong> @<%= listing.client.username %></li>
+                <li class="list-group-item"><strong>Token Status:</strong> Paid ✅</li>
+                <li class="list-group-item"><strong>Amount:</strong> ₹<%= listing.price.toLocaleString("en-IN") %></li>
+                <li class="list-group-item">
+                  <strong>Check-in:</strong> <%= listing.checkIn %> | 
+                  <strong>Check-out:</strong> <%= listing.checkOut %>
+                </li>
+              </ul>
+
+              <p class="text-muted"><i class="bi bi-geo-alt-fill"></i>
+                <%= listing.location.street %>, <%= listing.location.city %>, <%= listing.location.state %>, 
+                <%= listing.location.country %> - <%= listing.location.pincode %>
+              </p>
+
+              <a href="/listings/<%= listing._id %>" class="btn btn-outline-primary">View Listing</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    <% }) %>
+  </div>
+</div>

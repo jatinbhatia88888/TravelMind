@@ -58,3 +58,10 @@ module.exports.isReviewAuthor =async (req,res,next)=>{
   }
   next();
 }
+module.exports.owner= function isOwner(req, res, next) {
+  if (req.user && req.user.userType === 'owner') {
+    return next();
+  }
+  req.flash("error", "You must be an owner to access that page");
+  res.redirect("/listings");
+}

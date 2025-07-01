@@ -1,50 +1,138 @@
 <% layout('boilerplate') -%>
+
 <div class="row mt-3">
   <div class="col-8 offset-2">
+    <h1>Edit Your Hotel Listing</h1>
 
-  <h1>Edit your listing</h1>
-    <form method="POST" action ="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
-      <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-      <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required>
-      <div class="valid-feedback"> Title looks good!</div>
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-      <textarea name="listing[description]" class="form-control" required> <%= listing.description %> </textarea>
-      <div class="invalid-feedback"> please enter a short description</div>
-      </div>
-      <div class="mb-3 " >
-        Original Listing Image <br />
-       <img  src="<%= originalImageUrl %>" class="mb-3 card-img-top show-img" />
-    </div>
-      <div class="mb-3">
-        <label for="image" class="form-label" >Upload New Image</label>
-      <input name="listing[image]"  type="file" class="form-control"  />
-    </div>
-    <div class="row">
-    <div class="mb-3 col-md-4">
-      <label for="price" class="form-label">Price</label>
-      <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control required">
-      <div class="invalid-feedback"> Price should be valid </div>
-      </div>
-      <div class="mb-3 col-md-8">
-        <label for="country" class="form-label">Country</label>
-      <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control required">
-      <div class="invalid-feedback"> Country name should be valid </div>
-      </div>
-    </div>
+    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" 
+          novalidate class="needs-validation" enctype="multipart/form-data">
+
     
       <div class="mb-3">
-        <label for="location" class="form-label ">Location</label>
-      <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required>
-      <div class="invalid-feedback"> Location should be valid </div>
+        <label for="title" class="form-label">Hotel Name</label>
+        <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required>
+        <div class="valid-feedback">Title looks good!</div>
       </div>
 
-      <button class="btn btn-dark edit-btn mt-6">Edit</button>
-      <br><br>
-    </form >
- 
+      <!-- Description -->
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" class="form-control" rows="3" required><%= listing.description.trim() %></textarea>
+        <div class="invalid-feedback">Please enter a short description</div>
+      </div>
+
+      <!-- Existing Images -->
+      <% if (listing.images && listing.images.length > 0) { %>
+        <div class="mb-3">
+          <label class="form-label">Existing Images</label>
+          <div class="d-flex flex-wrap gap-2">
+            <% listing.images.forEach(img => { %>
+              <img src="<%= img.url %>" class="img-thumbnail" style="width: 150px; height: auto;" />
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="mb-3">
+        <label for="images" class="form-label">Upload New Images</label>
+      <input type="file" name="listing[images]" class="form-control" accept="image/*" multiple required>
+      </div>
+
+      <div class="mb-3">
+        <label for="price" class="form-label">Price per Night (₹)</label>
+        <input type="number" name="listing[price]" class="form-control" value="<%= listing.price %>" required>
+        <div class="invalid-feedback">Please enter a valid price</div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="roomCount" class="form-label">Total Number of Rooms</label>
+        <input type="number" name="listing[roomCount]" class="form-control" value="<%= listing.roomCount %>" min="1" required>
+        <div class="invalid-feedback">Please enter a valid number of rooms</div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="category" class="form-label">Hotel Category</label>
+        <select name="listing[category]" class="form-select" required>
+          <option value="" disabled>Select a category</option>
+          <option value="budget" <%= listing.category === 'budget' ? 'selected' : '' %>>Budget Hotel</option>
+          <option value="luxury" <%= listing.category === 'luxury' ? 'selected' : '' %>>Luxury Stay</option>
+          <option value="resort" <%= listing.category === 'resort' ? 'selected' : '' %>>Resort</option>
+          <option value="hostel" <%= listing.category === 'hostel' ? 'selected' : '' %>>Hostel</option>
+          <option value="homestay" <%= listing.category === 'homestay' ? 'selected' : '' %>>Homestay</option>
+          <option value="boutique" <%= listing.category === 'boutique' ? 'selected' : '' %>>Boutique Hotel</option>
+        </select>
+      </div>
+
+     
+      <div class="mb-3">
+        <label class="form-label">Amenities</label><br>
+        <% const amenitiesList = ['wifi', 'pool', 'parking', 'restaurant']; %>
+        <% amenitiesList.forEach(a => { %>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" name="listing[amenities][]" value="<%= a %>" 
+              <%= listing.amenities && listing.amenities.includes(a) ? 'checked' : '' %> id="amenity-<%= a %>">
+            <label class="form-check-label" for="amenity-<%= a %>"><%= a.charAt(0).toUpperCase() + a.slice(1) %></label>
+          </div>
+        <% }) %>
+      </div>
+
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="checkIn" class="form-label">Check-in Time</label>
+          <input type="time" name="listing[checkIn]" class="form-control" value="<%= listing.checkIn %>" required>
+        </div>
+        <div class="col-md-6">
+          <label for="checkOut" class="form-label">Check-out Time</label>
+          <input type="time" name="listing[checkOut]" class="form-control" value="<%= listing.checkOut %>" required>
+        </div>
+      </div>
+
+      
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="country" class="form-label">Country</label>
+          <input name="listing[location][country]" type="text" class="form-control" value="<%= listing.location?.country || '' %>" required>
+        </div>
+        <div class="col-md-4">
+          <label for="state" class="form-label">State</label>
+          <input name="listing[location][state]" type="text" class="form-control" value="<%= listing.location?.state || '' %>" required>
+        </div>
+        <div class="col-md-4">
+          <label for="city" class="form-label">City</label>
+          <input name="listing[location][city]" type="text" class="form-control" value="<%= listing.location?.city || '' %>" required>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-8">
+          <label for="street" class="form-label">Street / Area</label>
+          <input name="listing[location][street]" type="text" class="form-control" value="<%= listing.location?.street || '' %>" required>
+        </div>
+        <div class="col-md-4">
+          <label for="pincode" class="form-label">Pincode</label>
+          <input name="listing[location][pincode]" type="text" class="form-control" value="<%= listing.location?.pincode || '' %>" required>
+        </div>
+      </div>
+
+     
+      <div class="mb-3">
+        <label for="cancellationPolicy" class="form-label">Cancellation Policy</label>
+        <select name="listing[cancellationPolicy]" class="form-select" required>
+          <option value="" disabled>Select policy</option>
+          <option value="free_24h" <%= listing.cancellationPolicy === 'free_24h' ? 'selected' : '' %>>Free until 24 hours before check-in</option>
+          <option value="partial" <%= listing.cancellationPolicy === 'partial' ? 'selected' : '' %>>Partial refund (50%)</option>
+          <option value="none" <%= listing.cancellationPolicy === 'none' ? 'selected' : '' %>>No refund</option>
+        </select>
+      </div>
+
+     
+      <button class="btn btn-dark edit-btn mt-3 mb-5">Update Listing</button>
+    </form>
+
+  </div>
 </div>
-</div>
-<script src="/javacript/script.js"></script>
+
+<script src="/javascript/script.js"></script>
