@@ -10,6 +10,19 @@ const { render } = require("ejs");
 const multer =require("multer");
 const {storage} = require("../cloudConfig.js");
 const upload=multer({storage});
+router.get('/plantrip', (req, res) => {
+  res.render('plan');
+});
+router.post('/plantrip/itinerary',isLoggedIn,wrapAsync(listingController.generateItinerary));
+router.post("/pay/verify",isLoggedIn,wrapAsync(listingController.confirm));
+router.get("/owner/bookings", isLoggedIn, owner, wrapAsync(listingController.showOwnerBookings));
+router.get("/plantrip/result", (req, res) => {
+   console.log("working");
+  const data = req.session.itineraryData;
+  if (!data) return res.redirect("/listings/plantrip");
+  res.render("itinerary.ejs", data);
+});
+
 router.route("/")
 .get( wrapAsync(listingController.index))
 .post(isLoggedIn,upload.array('listing[images]'),validateListing,wrapAsync( listingController.createListing) );
@@ -27,8 +40,8 @@ router.route("/:id")
 .delete(isLoggedIn,isOwner,wrapAsync(listingController.destroyListing));
 
 router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm));
-router.post("/pay/verify",isLoggedIn,wrapAsync(listingController.confirm));
-router.get("/owner/bookings", isLoggedIn, owner, wrapAsync(listingController.showOwnerBookings));
+
+
 module.exports=router;
     
     

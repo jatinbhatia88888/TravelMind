@@ -1,0 +1,153 @@
+<% layout('boilerplate') -%>
+
+<style>
+  .form-section {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .form-section h2 {
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  .form-section p {
+    color: #555;
+    margin-bottom: 2rem;
+  }
+
+  .interest-icon {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+  }
+
+  .interest-icon.active {
+    background-color: #e9f5ff;
+    border-color: #3e52b5;
+    color: #3e52b5;
+  }
+
+  .interest-icon i {
+    font-size: 1.2rem;
+  }
+
+  .form-section .form-control {
+    border-radius: 0.75rem;
+  }
+
+  .generate-btn {
+    background-color: #3e52b5;
+    color: white;
+    border-radius: 25px;
+    padding: 0.6rem 2rem;
+    border: none;
+    font-size: 1rem;
+  }
+
+  .generate-btn:hover {
+    background-color: #2f3e94;
+  }
+</style>
+
+<div class="container mt-5 mb-5">
+  <div class="form-section">
+    <h2 class="text-center">Plan Your Trip</h2>
+    <p class="text-center">Answer a few questions and we'll create an itinerary and suggest hot places.</p>
+
+    <form action="/listings/plantrip/itinerary" method="POST">
+     
+      <div class="mb-3">
+        <label for="destination" class="form-label"><i class="fa-solid fa-magnifying-glass me-2"></i>Destination</label>
+        <input type="text" class="form-control" name="destination" placeholder="Enter location (e.g. Manali)" required>
+      </div>
+
+      
+      <div class="mb-3 row">
+        <div class="col">
+          <label class="form-label"><i class="fa-solid fa-calendar-days me-2"></i>Start Date</label>
+          <input type="date" class="form-control" name="startDate" required>
+        </div>
+        <div class="col">
+          <label class="form-label"><i class="fa-solid fa-calendar-day me-2"></i>End Date</label>
+          <input type="date" class="form-control" name="endDate" required>
+        </div>
+      </div>
+
+      
+      <div class="mb-3 row">
+        <div class="col">
+          <label class="form-label"><i class="fa-solid fa-indian-rupee-sign me-2"></i>Min Budget</label>
+          <input type="number" class="form-control" name="minBudget" placeholder="e.g. 5000" required>
+        </div>
+        <div class="col">
+          <label class="form-label"><i class="fa-solid fa-indian-rupee-sign me-2"></i>Max Budget</label>
+          <input type="number" class="form-control" name="maxBudget" placeholder="e.g. 10000" required>
+        </div>
+      </div>
+
+     
+      <div class="mb-4">
+        <label class="form-label"><i class="fa-solid fa-star me-2"></i>Preferences</label>
+        <div class="row">
+          <% const interests = [
+            { icon: 'fa-tree', label: 'Nature', name: 'nature' },
+            { icon: 'fa-landmark-dome', label: 'Historical', name: 'history' },
+            { icon: 'fa-mountain-sun', label: 'Mountains', name: 'mountains' },
+            { icon: 'fa-umbrella-beach', label: 'Beach', name: 'beach' },
+            { icon: 'fa-campground', label: 'Camping', name: 'camping' }
+          ]; %>
+
+          <% interests.forEach(i => { %>
+            <div class="col-6 col-md-4 mb-2">
+              <div class="interest-icon" data-name="<%= i.name %>">
+                <i class="fa-solid <%= i.icon %>"></i> <%= i.label %>
+                <input type="checkbox" name="interests" value="<%= i.name %>" hidden>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      
+      <div class="mb-3">
+        <label for="travelers" class="form-label"><i class="fa-solid fa-user-group me-2"></i>Travelers</label>
+        <input type="number" class="form-control" name="travelers" placeholder="Number of travelers" min="1" required>
+      </div>
+      <div class="mb-3">
+       <label for="note" class="form-label">
+      <i class="fa-solid fa-pencil-alt me-2"></i>Additional Notes
+     </label>
+      <textarea class="form-control" name="note" rows="3" placeholder="Tell us what kind of experience you’re looking for (e.g., no trekking, want street food, pet friendly, etc.)"></textarea>
+     </div>
+
+      <!-- Submit -->
+      <div class="text-center mt-4">
+        <button type="submit" class="generate-btn">Generate Itinerary</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.interest-icon').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const checkbox = btn.querySelector('input');
+      checkbox.checked = !checkbox.checked;
+      btn.classList.toggle('active');
+    });
+  });
+</script>
