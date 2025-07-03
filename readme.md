@@ -8,9 +8,9 @@ With features like Google login, real-time availability checks, interactive maps
 
 ##  Live Demo
 
-A full walkthrough demo is available for recruiters and reviewers:
+The TravelWorld application is fully deployed and accessible online. Click below to explore listings, plan your trip, and generate itineraries:
 
-**YouTube Demo (Unlisted):** [Watch Here](https://www.youtube.com/watch?v=F8JFgLfoCcM)
+**Live Site (Render):** [Visit TravelWorld](https://travelmind-z00u.onrender.com)
 
 ---
 
