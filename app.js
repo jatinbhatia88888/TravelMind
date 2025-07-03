@@ -38,6 +38,9 @@ const razorpay = new Razorpay({
   });
 
 
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
 
 
 
