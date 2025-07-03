@@ -1,3 +1,4 @@
+
 <% layout('boilerplate') -%>
 
 <style>
@@ -30,10 +31,9 @@
     object-fit: cover;
     width: 100%;
   }
+  
 
-  /* .stay-card .card-body {
-    padding: 1rem;
-  } */
+ 
 
   .btn-rounded {
     border-radius: 25px;
@@ -69,7 +69,7 @@
 
 .card-title {
   font-size: 1rem;
-  margin-bottom: 0.5rem; /* tighter spacing */
+  margin-bottom: 0.5rem; 
 }
 
 .price-book-wrapper,
@@ -82,12 +82,17 @@
   @media (max-width: 768px) {
     .stay-card img {
       height: 160px;
+  
+
     }
+
   }
+ 
+
 </style>
 
 <div class="itinerary-container">
-
+   <div class="pdf-section">
   <h3 class="mb-1">Here is your travel itinerary</h3>
 
   <!-- Preferences -->
@@ -101,10 +106,10 @@
     <% if (interests.includes("mountains")) { %>
       <span><i class="fa-solid fa-mountain-sun text-secondary"></i> Mountains</span>
     <% } %>
-    <!-- Add more if needed -->
+  
   </div>
 
-  <!-- Itinerary -->
+ 
   <% itinerary.forEach((day, index) => { %>
     <div class="day-header">Day <%= index + 1 %>: <%= day.city %></div>
     <ul>
@@ -113,18 +118,19 @@
       <% }) %>
     </ul>
   <% }) %>
-
-  <!-- Map -->
+</div>
+  
   <div id="map"></div>
 
- <!-- Recommended Stays -->
+ 
+  
 <div class="recommendation-title">Recommended stays</div>
 <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
   <% listings.forEach(listing => { %>
     <div class="col">
      <div class="card stay-card d-flex flex-column h-100">
 
-        <!-- Carousel -->
+        
         <div id="carousel<%= listing._id %>" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <% listing.images.forEach((img, index) => { %>
@@ -157,33 +163,31 @@
 
 
 
-
-
-
-
       </div>
     </div>
   <% }) %>
+
 </div>
 
   
 
-  <!-- Actions -->
-  <div class="mt-4 d-flex justify-content-center gap-3">
-    <button class="btn btn-primary btn-rounded">Save Itinerary</button>
+ 
+  <div class="mt-4 d-flex justify-content-center gap-3 no-pdf">
+    <button class="btn btn-primary btn-rounded  btn-download">Download Itinerary</button>
     <button class="btn btn-primary btn-rounded">Share Trip</button>
 
   </div>
 </div>
 
-<!-- OpenStreetMap / Leaflet -->
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
   const destination = "<%= destination %>";
   console.dir("<%= listings%>");
-  const map = L.map('map').setView([28.6139, 77.2090], 10); // fallback to Delhi
+  const map = L.map('map').setView([28.6139, 77.2090], 10);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -209,4 +213,52 @@
       console.error("Map error:", err);
       alert("Map failed to load.");
     });
+
+
+document.querySelector('.btn-download').addEventListener('click', () => {
+  const original = document.querySelector('.itinerary-container');
+
+  const clone = original.cloneNode(true);
+
+  
+  clone.querySelectorAll('.no-pdf').forEach(el => el.remove());
+
+ 
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'fixed';
+  wrapper.style.top = '-9999px';
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+
+  html2pdf()
+    .set({
+      filename: 'itinerary.pdf',
+      margin: [0.2, 0.2, 0.2, 0.2],
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        scrollY: 0,
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'a4',
+        orientation: 'portrait'
+      },
+      pagebreak: {
+        mode: ['css', 'legacy'],
+        avoid: ['.card', '.stay-card']
+      }
+    })
+    .from(clone)
+    .save()
+    .then(() => {
+    
+      document.body.removeChild(wrapper);
+    });
+});
+
+
+
 </script>

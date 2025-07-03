@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const User= require("../models/user.js");
 const admin = require("../utils/admin.js");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const mongoose =require("mongoose");
 require("dotenv").config(); 
 
 
@@ -282,8 +283,10 @@ module.exports.payment=async (req, res) => {
   
       
       await Listing.findByIdAndUpdate(listingId, { tokenPaid: true,tokenPaymentId: razorpay_payment_id,
-        buyer: userId });
-        await User.findByIdAndUpdate(userId, { $addToSet: {  PaidListings: listingId } });
+        client: userId });
+      await User.findByIdAndUpdate(userId, {
+  $addToSet: { PaidListings: new mongoose.Types.ObjectId(listingId) }
+});
         const listing = await User.findById(listingId);
         console.log(listing);
       

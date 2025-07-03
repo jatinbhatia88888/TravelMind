@@ -91,6 +91,22 @@
           <input type="time" name="listing[checkOut]" class="form-control" required>
         </div>
       </div>
+     <div class="mb-3">
+        <label for="propertyType" class="form-label">PropertyType</label>
+        <select name="listing[propertyType][]" class="form-select" multiple size="2" required >
+          <option value="" disabled >Select propertyType</option>
+          <option value="flat">Flats</option>
+          <option value="Main city">City area</option>
+          <option value="Room">Room</option>
+          <option value="Historical">Historical</option>
+          <option value="Mounatin area">Mounatain Area or Hills</option>
+          <option value="Beach">Beach</option>
+          <option value="Nature">Nature</option>
+          <option value="Camping">Camping</option>
+          <option value="Sunrise View">Sunrise view</option>
+        </select>
+      </div>
+
 
       
       <div class="row mb-3">
@@ -132,7 +148,7 @@
       </div>
 
     
-      <button type="submit" class="btn btn-primary mt-3">Submit Listing</button>
+      <button type="submit" class="btn btn-primary mt-3 mb-3">Submit Listing</button>
     </form>
   </div>
 </div>
