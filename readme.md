@@ -1,6 +1,6 @@
 # TravelMind
 
-TravelMind is a web-based platform designed to simplify travel planning, booking, and exploration. Users can search for destinations, browse property listings, plan trips with AI-powered itineraries, and complete bookings with secure payments.
+TravelMind is a web-based platform designed to simplify travel planning, booking, and exploration. Users can search for destinations, browse hotel or resort listings, plan trips with AI-powered itineraries, and complete bookings with secure payments.
 
 With features like Google login, real-time availability checks, interactive maps, and a personalized dashboard for both travelers and property owners, TravelMind creates a seamless travel experience from start to finish.
 
