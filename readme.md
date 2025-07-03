@@ -8,9 +8,9 @@ With features like Google login, real-time availability checks, interactive maps
 
 ##  Live Demo
 
-The TravelWorld application is fully deployed and accessible online. Click below to explore listings, plan your trip, and generate itineraries:
+The TravelMind application is fully deployed and accessible online. Click below to explore listings, plan your trip, and generate itineraries:
 
-**Live Site (Render):** [Visit TravelWorld](https://travelmind-z00u.onrender.com)
+**Live Site (Render):** [Visit TravelMind](https://travelmind-z00u.onrender.com)
 
 ---
 
