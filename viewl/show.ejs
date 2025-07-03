@@ -59,31 +59,35 @@
             </div>
           <% } %>
            <div class="row mt-3 mb-3">
+
+
       <% if(currUser) { %>
         <hr/>
-       <% if( !listing.owner._id.equals(currUser._id)) { %>
-          <button class="btn btn-dark col-4  " id="fav-<%= listing._id %>"
-            onclick="toggleFavorite('<%= currUser._id %>', '<%= listing._id %>')">
-            <% if (favoriteListings.includes(  listing._id.toString())) { %>
-                Added to Favorite 
-            <% } 
-            else { %>
-                Add to Favorite
-            <% } %>
-        </button>
-         <% } %>
+       <% if (currUser && currUser.userType === "traveler" && !listing.owner._id.equals(currUser._id)) { %>
+  <button class="btn btn-dark col-4" id="fav-<%= listing._id %>"
+    onclick="toggleFavorite('<%= currUser._id %>', '<%= listing._id %>')">
+    <% if (favoriteListings.includes(listing._id.toString())) { %>
+      Added to Favorite 
+    <% } else { %>
+      Add to Favorite
+    <% } %>
+  </button>
+<% } else if (currUser && currUser.userType === "owner") { %>
+  <div class="alert alert-warning col-12 mt-3">Owners cannot add listings to favorites.</div>
+<% } %>
+
          
         
 
         
         
-          <% if (currUser&&!listing.owner._id.equals(currUser._id)) { %>
-            <% if (!listing.tokenPaid) { %>
-              <button class="btn btn-dark col-4 offset-4" id="pay-btn">Pay Token Money</button>
-            <% } else { %>
-              <button class="btn btn-dark col-4 offset-4" disabled>Already Paid</button>
-            <% } %>
-          <% } %>
+      <% if (currUser && currUser.userType === "traveler" && !listing.owner._id.equals(currUser._id)) { %>
+  <button class="btn btn-dark col-4 offset-4" data-bs-toggle="modal" data-bs-target="#bookingModal">
+    Check availability
+  </button>
+<% } %>
+
+
         
         
 </div>
@@ -150,16 +154,9 @@
 </div>
 
 
-
-
-
-
-
      
       <% } %>
 
-      
-      
 
     <div class="container my-4">
   <div class="card shadow-sm" style="border-radius: 1rem;">
@@ -168,10 +165,11 @@
       <div id="map" style="height: 300px; width: 100%; border-radius: 0.75rem;"></div>
     </div>
   </div>
+ 
+<button class="btn btn-dark d-none" id="pay-btn">Trigger Pay</button>
+
 </div>
-
-
-    
+   
      <% if(true) { %>
      <script>
       var map = L.map('map').setView([28.6139, 77.2090], 10); 
@@ -248,10 +246,6 @@
 
 
 
-
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
       const payBtn = document.getElementById("pay-btn");
 
@@ -291,27 +285,36 @@ document.addEventListener("DOMContentLoaded", function () {
                       description: "Token Money Payment",
                       order_id: data.orderId,
                       handler: async function (response) {
-                          
-                          const verifyResponse = await fetch("/listings/pay/verify", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                  razorpay_payment_id: response.razorpay_payment_id,
-                                  razorpay_order_id: response.razorpay_order_id,
-                                  razorpay_signature: response.razorpay_signature,
-                                  listingId,
-                                  userId
-                              })
-                          });
+  const checkIn = document.getElementById("checkIn").value;
+  const checkOut = document.getElementById("checkOut").value;
+  const rooms = parseInt(document.getElementById("rooms").value);
+  const price = parseInt(document.getElementById("priceDisplay").value);
 
-                          const verifyData = await verifyResponse.json();
-                          if (verifyData.success) {
-                              alert("Payment Successful!");
-                              window.location.reload(); 
-                          } else {
-                              alert("Payment verification failed!");
-                          }
-                      }
+  const verifyResponse = await fetch("/listings/pay/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_signature: response.razorpay_signature,
+      listingId,
+      userId,
+      checkIn,
+      checkOut,
+      rooms,
+      price
+    })
+  });
+
+  const verifyData = await verifyResponse.json();
+  if (verifyData.success) {
+    alert("Payment Successful!");
+    window.location.reload();
+  } else {
+    alert("Payment verification failed!");
+  }
+}
+
                   };
 
                   const rzp = new Razorpay(options);
@@ -323,9 +326,113 @@ document.addEventListener("DOMContentLoaded", function () {
           });
       }
   })
+  
+document.addEventListener("DOMContentLoaded", function () {
+  const confirmBookingBtn = document.getElementById("confirm-booking-btn");
+
+  confirmBookingBtn.addEventListener("click", async function () {
+    const listingId = "<%= listing._id %>";
+    const checkIn = document.getElementById("checkIn").value;
+    const checkOut = document.getElementById("checkOut").value;
+    const rooms = parseInt(document.getElementById("rooms").value);
+
+    if (!checkIn || !checkOut || !rooms) {
+      alert("Please fill in all booking details.");
+      return;
+    }
+
+   
+    const availabilityRes = await fetch(`/listings/check-availability/${listingId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ checkIn, checkOut, rooms })
+    });
+
+    const availability = await availabilityRes.json();
+
+    if (!availability.success) {
+      alert("Error checking availability. Please try again.");
+      return;
+    }
+
+    if (!availability.available) {
+      alert(`Only ${availability.availableRooms} room(s) available for selected dates.`);
+      return;
+    }
+
+   
+    document.getElementById("pay-btn")?.click(); 
+  });
+});
+
+
+ 
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkIn = document.getElementById("checkIn");
+    const checkOut = document.getElementById("checkOut");
+    const rooms = document.getElementById("rooms");
+    const priceDisplay = document.getElementById("priceDisplay");
+    const pricePerRoom = <%= listing.price %>
+
+    function updatePrice() {
+      const inDate = new Date(checkIn.value);
+      const outDate = new Date(checkOut.value);
+      const days = (outDate - inDate) / (1000 * 60 * 60 * 24);
+      const roomCount = parseInt(rooms.value);
+
+      if (days > 0 && roomCount > 0) {
+        priceDisplay.value = days * roomCount * pricePerRoom;
+      } else {
+        priceDisplay.value = "";
+      }
+    }
+
+    checkIn.addEventListener("change", updatePrice);
+    checkOut.addEventListener("change", updatePrice);
+    rooms.addEventListener("input", updatePrice);
+  });
+
 
         </script>
           <% } %>
   
   </div>
+ 
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookingModalLabel">Confirm Your Booking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="booking-form">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="checkIn" class="form-label">Check-in Date</label>
+              <input type="date" class="form-control" id="checkIn" required>
+            </div>
+            <div class="col-md-6">
+              <label for="checkOut" class="form-label">Check-out Date</label>
+              <input type="date" class="form-control" id="checkOut" required>
+            </div>
+            <div class="col-md-6">
+              <label for="rooms" class="form-label">Rooms Required</label>
+              <input type="number" class="form-control" id="rooms" min="1" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Total Price (₹)</label>
+              <input type="text" id="priceDisplay" class="form-control" readonly>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-dark" id="confirm-booking-btn">Confirm & Pay</button>
+      </div>
+    </div>
+  </div>
   
+
+</div>

@@ -1,59 +1,59 @@
+body {
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-    body {
-      background-color: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+.main {
+  flex: 1;
+}
 
-    .main {
-      flex: 1;
-    }
+.right-pane {
+  background: linear-gradient(to right, #3e52b5, #546de5);
+  color: #ffffff;
+}
 
-    .right-pane {
-      background: radial-gradient(circle at top left, #0f3d3e, #0b2b2c);
-      color: #e6f1f1;
-    }
+.form-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  color: #000;
+}
 
-    .form-card {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
-      color: #000;
-    }
+.btn-primary {
+  background-color: #3e52b5;
+  border-color: #3e52b5;
+  color: #fff;
+}
 
-    .btn-primary {
-      background-color: #0f3d3e;
-      border-color: #0f3d3e;
-    }
+.btn-primary:hover {
+  background-color: #2f3ca8;
+  border-color: #2f3ca8;
+}
 
-    .btn-primary:hover {
-      background-color: #0b2b2c;
-      border-color: #0b2b2c;
-    }
+.btn-google {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+}
 
-    .btn-google {
-      background: #fff;
-      border: 1px solid #ccc;
-      color: #333;
-    }
+.btn-google img {
+  height: 20px;
+  margin-right: 10px;
+}
 
-    .btn-google img {
-      height: 20px;
-      margin-right: 10px;
-    }
+footer {
+  background-color: #3e52b5;
+  color: #f1f1f1;
+}
 
-    footer {
-      background-color: #0b2b2c;
-      color: #ddd;
-    }
+footer a {
+  color: #ffe;
+  text-decoration: none;
+}
 
-    footer a {
-      color: #a3f7ff;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
+footer a:hover {
+  text-decoration: underline;
+}

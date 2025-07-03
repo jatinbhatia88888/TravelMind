@@ -32,7 +32,9 @@ const userSchema = new Schema({
       ref: "Listing",
     }
   ],
-
+Bookings: [
+  { type: Schema.Types.ObjectId, ref: "Booking" }
+],
   
   createdAt: {
     type: Date,

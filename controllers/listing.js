@@ -6,6 +6,7 @@ const User= require("../models/user.js");
 const admin = require("../utils/admin.js");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const mongoose =require("mongoose");
+const Booking = require("../models/Booking.js");
 require("dotenv").config(); 
 
 
@@ -267,46 +268,117 @@ module.exports.payment=async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
     }
   }
-  module.exports.confirm= async (req, res) => {
-    try {
-      const { razorpay_payment_id, razorpay_order_id, razorpay_signature, listingId, userId } = req.body;
-  
-      console.log(req.body);
-      const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-      const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-        .update(body)
-        .digest("hex");
-  
-      if (expectedSignature !== razorpay_signature) {
-        return res.status(400).json({ success: false, message: "Payment verification failed" });
-      }
-  
-      
-      await Listing.findByIdAndUpdate(listingId, { tokenPaid: true,tokenPaymentId: razorpay_payment_id,
-        client: userId });
-      await User.findByIdAndUpdate(userId, {
-  $addToSet: { PaidListings: new mongoose.Types.ObjectId(listingId) }
-});
-        const listing = await User.findById(listingId);
-        console.log(listing);
-      
-      res.json({ success: true, message: "Payment verified successfully" });
-    } catch (error) {
-      console.error("Error verifying payment:", error);
-     res.status(500).json({ success: false, message: "Server error" });
+  module.exports.confirm = async (req, res) => {
+  try {
+    let {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      listingId,
+      userId,
+      checkIn,
+      checkOut,
+      rooms,
+      price
+    } = req.body;
+    
+    userId = req.user._id;
+
+    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Payment verification failed" });
     }
+
+   
+    const booking=await Booking.create({
+      listing: listingId,
+      client: userId,
+      checkIn,
+      checkOut,
+      roomsBooked: rooms,
+      price,
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      tokenPaid: true
+    });
+
+   
+    await Listing.findByIdAndUpdate(listingId, {
+      tokenPaid: true,
+      tokenPaymentId: razorpay_payment_id,
+      client: userId
+    });
+
+   
+    await User.findByIdAndUpdate(userId, {
+  $addToSet: { Bookings: booking._id }
+});
+
+    res.json({ success: true, message: "Payment verified and booking saved!" });
+  } catch (error) {
+    console.error("Error verifying payment:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
+};
+
   module.exports.paid= async(req,res)=>{
-      const userId=req.user._id.toString();
-       
-          let favoriteListings = await User.findOne({ _id:userId });
-          const listingExists = favoriteListings.PaidListings;
-         const allListings = await Listing.find({ _id: { $in: listingExists } });
-        
-          res.render("index.ejs",{allListings});
+      const bookings = await Booking.find({ client: req.user._id })
+  .populate("listing")
+  .populate("client");
+
+res.render("booking.ejs", { bookings, userType: "traveler" });
+
       
   }
   module.exports.showOwnerBookings = async (req, res) => {
-  const listings = await Listing.find({ owner: req.user._id, tokenPaid: true }).populate("client");
-  res.render("booking.ejs", { listings });
+  const bookings = await Booking.find({})
+  .populate({
+    path: "listing",
+    match: { owner: req.user._id },
+  })
+  .populate("client");
+
+const filteredBookings = bookings.filter(b => b.listing !== null);
+res.render("booking.ejs", { bookings: filteredBookings, userType: "owner" });
+
 };
+module.exports.checkavailability=async (req, res) => {
+  const { checkIn, checkOut, rooms } = req.body;
+  const listingId = req.params.id;
+
+  try {
+    const existingBookings = await Booking.find({
+      listing: listingId,
+      checkIn: { $lt: new Date(checkOut) },
+      checkOut: { $gt: new Date(checkIn) },
+    });
+
+    const totalBooked = existingBookings.reduce((sum, b) => sum + b.roomsBooked, 0);
+
+    const listing = await Listing.findById(listingId);
+    const totalRooms = listing.roomCount || 1;
+
+    const availableRooms = totalRooms - totalBooked;
+
+    if (availableRooms < parseInt(rooms)) {
+      return res.json({
+        success: true,
+        available: false,
+        availableRooms
+      });
+    }
+
+    res.json({
+      success: true,
+      available: true,
+      availableRooms
+    });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: "Error checking availability." });
+  }
+}

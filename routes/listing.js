@@ -5,7 +5,7 @@ const router=express.Router();
 const Listing=require("../models/listing.js");
 const ExpressError=require("../utils/ExpressError.js")
 const listingController=require("../controllers/listing.js");
-
+const Booking = require("../models/Booking.js");
 const { render } = require("ejs");
 const multer =require("multer");
 const {storage} = require("../cloudConfig.js");
@@ -22,6 +22,10 @@ router.get("/plantrip/result", (req, res) => {
   if (!data) return res.redirect("/listings/plantrip");
   res.render("itinerary.ejs", data);
 });
+
+
+router.post("/check-availability/:id",listingController.checkavailability);
+
 
 router.route("/")
 .get( wrapAsync(listingController.index))

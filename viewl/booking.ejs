@@ -1,42 +1,113 @@
 <% layout('boilerplate') %>
 
-<div class="container mt-4">
-  <h2 class="mb-4">Bookings Received</h2>
+<style>
+  .confirmation-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    padding: 16px;
+    font-family: sans-serif;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.92rem;
+  }
 
-  <% if (listings.length === 0) { %>
-    <div class="alert alert-info">You haven't received any bookings yet.</div>
-  <% } %>
+  .confirmation-title {
+    color: green;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
 
-  <div class="row row-cols-1 row-cols-md-2 g-4">
-    <% listings.forEach(listing => { %>
-      <% if (listing.tokenPaid && listing.client) { %>
-        <div class="col">
-          <div class="card shadow-sm h-100">
-            <img src="<%= listing.images[0]?.url || '/default.jpg' %>" class="card-img-top" alt="Hotel Image">
-            <div class="card-body">
-              <h5 class="card-title"><%= listing.title %></h5>
-              <p class="card-text"><%= listing.description.substring(0, 100) %>...</p>
+  .confirmation-subtitle {
+    font-size: 0.88rem;
+    color: #444;
+    margin-bottom: 10px;
+  }
 
-              <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><strong>Client:</strong> @<%= listing.client.username %></li>
-                <li class="list-group-item"><strong>Token Status:</strong> Paid ✅</li>
-                <li class="list-group-item"><strong>Amount:</strong> ₹<%= listing.price.toLocaleString("en-IN") %></li>
-                <li class="list-group-item">
-                  <strong>Check-in:</strong> <%= listing.checkIn %> | 
-                  <strong>Check-out:</strong> <%= listing.checkOut %>
-                </li>
-              </ul>
+  .property-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
 
-              <p class="text-muted"><i class="bi bi-geo-alt-fill"></i>
-                <%= listing.location.street %>, <%= listing.location.city %>, <%= listing.location.state %>, 
-                <%= listing.location.country %> - <%= listing.location.pincode %>
-              </p>
+  .section-title {
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #ddd;
+  }
 
-              <a href="/listings/<%= listing._id %>" class="btn btn-outline-primary">View Listing</a>
-            </div>
+  .detail-line {
+    margin-bottom: 4px;
+  }
+
+  .label {
+    font-weight: 600;
+  }
+
+  .view-btn {
+    margin-top: auto;
+    font-size: 0.88rem;
+    padding: 6px 10px;
+  }
+</style>
+
+<% function formatDate(dateStr) {
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return new Date(dateStr).toLocaleDateString('en-IN', options);
+} %>
+
+<div class="container my-4">
+  <h4 class="mb-4 text-center">
+    <% if (userType === 'owner') { %> Bookings Received <% } else { %> My Bookings <% } %>
+  </h4>
+
+  <div class="row g-4">
+    <% bookings.forEach(booking => { 
+         const listing = booking.listing;
+         if (!listing) return; 
+    %>
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+        <div class="confirmation-card">
+          <div class="confirmation-title">
+            <% if (userType === 'owner') { %> Payment Received <% } else { %> Booking Confirmed <% } %>
           </div>
+          <div class="confirmation-subtitle">
+            <% if (userType === 'owner') { %> New booking confirmed <% } else { %> Your booking was successful <% } %>
+          </div>
+
+          <img src="<%= listing.images[0]?.url || '/default.jpg' %>" class="property-img" alt="Property Image">
+
+          <div class="detail-line"><span class="label">Property:</span> <%= listing.title %></div>
+          <div class="detail-line"><span class="label">Location:</span> <%= listing.location.city %>, <%= listing.location.state %></div>
+          <div class="detail-line"><span class="label">Rooms:</span> <%= booking.roomsBooked %></div>
+
+          <div class="section-title">Booking Details</div>
+          <div class="detail-line"><span class="label">Guest:</span> 
+            <%= booking.client?.username ? '@' + booking.client.username : 'Guest' %>
+          </div>
+          <div class="detail-line"><span class="label">Email:</span> <%= booking.client?.email || 'N/A' %></div>
+          <div class="detail-line"><span class="label">Check-in:</span> <%= formatDate(booking.checkIn) %></div>
+          <div class="detail-line"><span class="label">Check-out:</span> <%= formatDate(booking.checkOut) %></div>
+          <div class="detail-line">
+            <span class="label">Nights:</span>
+            <%= Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24)) %>
+          </div>
+          <div class="detail-line"><span class="label">Status:</span> Confirmed</div>
+
+          <div class="section-title">Payment</div>
+          <div class="detail-line"><span class="label">Amount:</span> ₹<%= booking.price?.toLocaleString('en-IN') %></div>
+          <div class="detail-line"><span class="label">ID:</span> <%= booking.razorpayPaymentId || "N/A" %></div>
+          <div class="detail-line"><span class="label">Method:</span> Razorpay</div>
+
+          <a href="/listings/<%= listing._id %>" class="btn btn-outline-dark view-btn w-100">View Listing</a>
         </div>
-      <% } %>
+      </div>
     <% }) %>
   </div>
 </div>
